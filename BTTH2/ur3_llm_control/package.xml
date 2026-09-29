@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+
+<package format="3">
+
+  <name>ur3_llm_control</name>
+
+  <version>0.0.1</version>
+
+  <description>
+    Natural language control of UR3e using LLM planner,
+    MoveIt 2 and Gazebo.
+  </description>
+
+  <maintainer email="nguyenduy10112k5@gmail.com">
+    Nguyen Duc Duy
+  </maintainer>
+
+  <license>MIT</license>
+
+  <!-- BUILD -->
+  <buildtool_depend>
+    ament_cmake
+  </buildtool_depend>
+
+  <build_depend>
+    rosidl_default_generators
+  </build_depend>
+
+  <!-- ROS -->
+  <depend>
+    rclcpp
+  </depend>
+
+  <depend>
+    rclpy
+  </depend>
+
+  <depend>
+    std_msgs
+  </depend>
+
+  <depend>
+    geometry_msgs
+  </depend>
+
+  <!-- MOVEIT -->
+  <depend>
+    moveit_msgs
+  </depend>
+
+  <depend>
+    shape_msgs
+  </depend>
+
+  <depend>
+    moveit_ros_planning_interface
+  </depend>
+
+  <!-- GAZEBO -->
+  <depend>
+    ros_gz_interfaces
+  </depend>
+
+  <!-- TF -->
+  <depend>
+    tf2
+  </depend>
+
+  <depend>
+    tf2_ros
+  </depend>
+
+  <!-- PYTHON -->
+  <depend>
+    ament_index_python
+  </depend>
+
+  <!-- SERVICE -->
+  <exec_depend>
+    rosidl_default_runtime
+  </exec_depend>
+
+  <member_of_group>
+    rosidl_interface_packages
+  </member_of_group>
+
+  <export>
+    <build_type>
+      ament_cmake
+    </build_type>
+  </export>
+
+</package>
