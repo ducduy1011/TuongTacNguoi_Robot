@@ -1,6 +1,6 @@
 string skill
 string object
-string zone
+string target
 ---
 bool success
 string status

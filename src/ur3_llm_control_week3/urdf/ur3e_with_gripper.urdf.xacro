@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="ur3e_week3">
+<xacro:arg name="controllers" default="$(find ur3_llm_control_week3)/config/gripper_controllers.yaml"/>
+<xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
+<xacro:include filename="simple_gripper.xacro"/>
+<link name="world"/>
+<xacro:ur_robot name="ur3e_week3" tf_prefix="" parent="world" ur_type="ur3e"
+ joint_limits_parameters_file="$(find ur_description)/config/ur3e/joint_limits.yaml"
+ kinematics_parameters_file="$(find ur_description)/config/ur3e/default_kinematics.yaml"
+ physical_parameters_file="$(find ur_description)/config/ur3e/physical_parameters.yaml"
+ visual_parameters_file="$(find ur_description)/config/ur3e/visual_parameters.yaml"
+ generate_ros2_control_tag="false" sim_ignition="true"><origin xyz="0 0 0" rpy="0 0 0"/></xacro:ur_robot>
+<xacro:simple_gripper/>
+<ros2_control name="Week3System" type="system">
+ <hardware><plugin>ign_ros2_control/IgnitionSystem</plugin></hardware>
+ <xacro:macro name="controlled_joint" params="name initial">
+  <joint name="${name}"><command_interface name="position"/><state_interface name="position"><param name="initial_value">${initial}</param></state_interface><state_interface name="velocity"/></joint>
+ </xacro:macro>
+ <xacro:controlled_joint name="shoulder_pan_joint" initial="-1.5708"/>
+ <xacro:controlled_joint name="shoulder_lift_joint" initial="-1.5708"/>
+ <xacro:controlled_joint name="elbow_joint" initial="1.5708"/>
+ <xacro:controlled_joint name="wrist_1_joint" initial="-1.5708"/>
+ <xacro:controlled_joint name="wrist_2_joint" initial="-1.5708"/>
+ <xacro:controlled_joint name="wrist_3_joint" initial="0"/>
+ <xacro:controlled_joint name="left_finger_joint" initial="0.015"/>
+ <xacro:controlled_joint name="right_finger_joint" initial="0.015"/>
+</ros2_control>
+<gazebo><plugin filename="/opt/ros/humble/lib/libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin"><parameters>$(arg controllers)</parameters></plugin></gazebo>
+<gazebo><plugin filename="$(find ur3_llm_control_week3)/../../lib/libphysical_grasp_system.so" name="PhysicalGrasp"/></gazebo>
+</robot>

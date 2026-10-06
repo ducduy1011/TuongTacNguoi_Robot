@@ -1,0 +1,4 @@
+---
+bool success
+string scene_json
+string status

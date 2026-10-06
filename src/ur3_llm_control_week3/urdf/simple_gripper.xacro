@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+<xacro:macro name="simple_gripper" params="">
+  <xacro:property name="gripper_colors" value="${dict(
+    gripper_aluminum='0.62 0.66 0.70 1', gripper_steel='0.78 0.81 0.84 1',
+    gripper_dark='0.14 0.16 0.18 1', gripper_accent='0.373 0.514 0.565 1')}"/>
+  <xacro:macro name="gripper_material" params="name">
+    <material name="${name}"><color rgba="${gripper_colors[name]}"/></material>
+  </xacro:macro>
+  <xacro:macro name="gripper_box" params="xyz size material">
+    <visual><origin xyz="${xyz}"/><geometry><box size="${size}"/></geometry><xacro:gripper_material name="${material}"/></visual>
+  </xacro:macro>
+  <xacro:macro name="gripper_face" params="sign">
+    <xacro:gripper_box xyz="0 ${sign*0.024} 0.013" size="0.073 0.0016 0.0115" material="gripper_dark"/>
+    <xacro:gripper_box xyz="0 ${sign*0.0249} 0.013" size="0.046 0.0002 0.0055" material="gripper_accent"/>
+    <xacro:macro name="gripper_bolt" params="x">
+      <visual><origin xyz="${x} ${sign*0.0245} 0.013" rpy="${pi/2} 0 0"/><geometry><cylinder radius="0.0018" length="0.001"/></geometry><xacro:gripper_material name="gripper_steel"/></visual>
+    </xacro:macro>
+    <xacro:gripper_bolt x="-0.031"/><xacro:gripper_bolt x="0.031"/>
+  </xacro:macro>
+  <link name="gripper_base_link">
+    <visual><origin xyz="0 0 0.015"/><geometry><mesh filename="file://$(find ur3_llm_control_week3)/urdf/meshes/gripper_housing.stl"/></geometry><xacro:gripper_material name="gripper_aluminum"/></visual>
+    <visual><origin xyz="0 0 0.003"/><geometry><cylinder radius="0.020" length="0.006"/></geometry><xacro:gripper_material name="gripper_dark"/></visual>
+    <xacro:gripper_box xyz="0 0 0.027" size="0.10 0.032 0.006" material="gripper_dark"/>
+    <xacro:gripper_face sign="1"/><xacro:gripper_face sign="-1"/>
+    <collision><origin xyz="0 0 0.015"/><geometry><box size="0.10 0.05 0.03"/></geometry></collision>
+    <inertial><origin xyz="0 0 0.015"/><mass value="0.15"/><inertia ixx="0.000043" iyy="0.00013625" izz="0.00015625" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="gripper_mount" type="fixed"><parent link="tool0"/><child link="gripper_base_link"/></joint>
+  <gazebo reference="gripper_mount"><preserveFixedJoint>true</preserveFixedJoint></gazebo>
+  <xacro:macro name="finger" params="side sign">
+    <link name="${side}_finger_link">
+      <visual><origin xyz="0 0 0.025"/><geometry><mesh filename="file://$(find ur3_llm_control_week3)/urdf/meshes/gripper_finger.stl"/></geometry><xacro:gripper_material name="gripper_steel"/></visual>
+      <xacro:gripper_box xyz="${-sign*0.00475} 0 0.031" size="0.0005 0.021 0.032" material="gripper_dark"/>
+      <xacro:gripper_box xyz="${sign*0.00475} 0 0.010" size="0.0005 0.017 0.008" material="gripper_accent"/>
+      <collision><origin xyz="0 0 0.025"/><geometry><box size="0.01 0.025 0.05"/></geometry></collision>
+      <inertial><origin xyz="0 0 0.025"/><mass value="0.03"/><inertia ixx="0.0000078125" iyy="0.0000065" izz="0.00000181" ixy="0" ixz="0" iyz="0"/></inertial>
+    </link>
+    <joint name="${side}_finger_joint" type="prismatic">
+      <parent link="gripper_base_link"/><child link="${side}_finger_link"/><origin xyz="${sign*0.03} 0 0.03"/>
+      <axis xyz="${sign} 0 0"/><limit lower="-0.003" upper="0.016" effort="30" velocity="0.04"/><dynamics damping="0.05" friction="0.0"/>
+    </joint>
+    <gazebo reference="${side}_finger_link"><mu1>1.5</mu1><mu2>1.5</mu2></gazebo>
+  </xacro:macro>
+  <xacro:finger side="left" sign="1"/><xacro:finger side="right" sign="-1"/>
+  <link name="grasp_tcp"/>
+  <joint name="grasp_tcp_joint" type="fixed"><parent link="gripper_base_link"/><child link="grasp_tcp"/><origin xyz="0 0 0.06"/></joint>
+</xacro:macro>
+</robot>

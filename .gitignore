@@ -1,12 +1,7 @@
-build/
-install/
-log/
-
-.vscode/
-
+/build/
+/install/
+/log/
+/tmp/
+/private/
 __pycache__/
 *.pyc
-
-*~
-.DS_Store
-
