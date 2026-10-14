@@ -109,7 +109,7 @@ bash ~/turtlebot4_btth4_ws/teleop_wasd.sh
 | Space / X | Dừng ngay |
 | Ctrl+C | Dừng và thoát |
 
-Giữ focus ở Terminal 3. Giữ hoặc nhấn liên tiếp phím. Teleop phát lệnh 10 Hz; tốc độ tiến/lùi 0,3 m/s, quay 0,5 rad/s. Không có phím mới trong 0,8 s thì tự phát lệnh dừng. Nhấn Space trước khi chuyển cửa sổ.
+Giữ focus ở Terminal 3. Giữ hoặc nhấn liên tiếp phím. Teleop phát lệnh 10 Hz; tốc độ tiến/lùi 0,5 m/s, quay 0,5 rad/s. Không có phím mới trong 0,8 s thì tự phát lệnh dừng. Nhấn Space trước khi chuyển cửa sổ.
 
 Để kiểm tra robot nhận lệnh, trong Terminal 4 có thể chạy `ros2 topic echo /cmd_vel`, quan sát khi bạn nhấn phím rồi Ctrl+C dừng echo. Đọc lại odom và đối chiếu robot thật sự di chuyển trong Gazebo.
 

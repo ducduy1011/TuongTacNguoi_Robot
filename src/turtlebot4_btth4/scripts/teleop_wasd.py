@@ -15,7 +15,7 @@ def main():
         raise SystemExit('Open this command in an interactive Terminal.')
     rclpy.init()
     node = rclpy.create_node('teleop_wasd')
-    speed = float(node.declare_parameter('speed', 0.3).value)
+    speed = float(node.declare_parameter('speed', 0.5).value)
     turn = float(node.declare_parameter('turn', 0.5).value)
     timeout = float(node.declare_parameter('key_timeout', 0.8).value)
     if speed <= 0 or turn <= 0 or timeout <= 0:
