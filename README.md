@@ -111,6 +111,10 @@ bash ~/turtlebot4_btth4_ws/teleop_wasd.sh
 
 Giữ focus ở Terminal 3. Giữ hoặc nhấn liên tiếp phím. Teleop phát lệnh 10 Hz; tốc độ tiến/lùi 0,5 m/s, quay 0,5 rad/s. Không có phím mới trong 0,8 s thì tự phát lệnh dừng. Nhấn Space trước khi chuyển cửa sổ.
 
+Script tự đặt `safety_override=backup_only` mỗi lần mở và chuyển bộ gõ IBus sang English nếu đang dùng Unikey/bộ gõ khác; khôi phục bộ gõ khi thoát. Terminal hiện `Key W/A/S/D` để xác nhận nhận đúng phím. 0,5 m/s là lệnh WASD; Create 3 vẫn áp dụng giới hạn tốc độ của chế độ an toàn (trên cấu hình hiện tại `max_speed=0.306`) và controller bánh xe.
+
+Nếu W làm robot tiến rồi lùi, xem `/hazard_detection` và log motion control: reflex va chạm có thể đang ưu tiên điều khiển và bỏ qua WASD. Nhấn Space, đợi reflex kết thúc; quay A/D hướng ra vùng trống trước khi W, tránh chạy thẳng trở lại dock sau undock. Không vô hiệu hóa reflex va chạm để vượt qua vật cản.
+
 Để kiểm tra robot nhận lệnh, trong Terminal 4 có thể chạy `ros2 topic echo /cmd_vel`, quan sát khi bạn nhấn phím rồi Ctrl+C dừng echo. Đọc lại odom và đối chiếu robot thật sự di chuyển trong Gazebo.
 
 Khảo sát phần lớn các hành lang và nhánh có thể đi. Quay chậm ở góc, tránh chạm tường, trở lại khu vực đã đi để hỗ trợ loop closure. Theo dõi scan và map trên RViz. Map đạt yêu cầu khi tường, hành lang và vật cản chính rõ, không có tường nhân đôi hoặc vùng lệch lớn. Vùng trắng là free, đen là occupied, xám là unknown.

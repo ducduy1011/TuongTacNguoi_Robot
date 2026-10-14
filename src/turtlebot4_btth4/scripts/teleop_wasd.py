@@ -42,6 +42,9 @@ def main():
                     break
                 twist.linear.x, twist.angular.z = bindings.get(key, (0.0, 0.0))
                 last_key = time.monotonic()
+                if key in bindings:
+                    print(f'\rKey {key.upper()}: v={twist.linear.x:.2f} m/s, '
+                          f'w={twist.angular.z:.2f} rad/s     ', end='', flush=True)
                 if key not in bindings:
                     pub.publish(twist)
             now = time.monotonic()
@@ -59,6 +62,7 @@ def main():
                 pub.publish(Twist())
                 time.sleep(0.03)
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+        print()
         node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
