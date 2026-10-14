@@ -16,7 +16,7 @@ find_package(Boost REQUIRED COMPONENTS system serialization filesystem thread)
 find_library(KARTO_LIBRARY kartoSlamToolbox
   HINTS "${slam_toolbox_DIR}/../../../lib" REQUIRED)
 if(NOT EXISTS "${SOLVER_SOURCE}/solvers/ceres_solver.cpp")
-  message(FATAL_ERROR "Run setup_runtime.sh to download the pinned official solver.")
+  message(FATAL_ERROR "Run python3 tools/prepare_runtime.py to download the pinned official solver.")
 endif()
 add_library(ceres_solver_plugin SHARED "${SOLVER_SOURCE}/solvers/ceres_solver.cpp")
 target_include_directories(ceres_solver_plugin PRIVATE

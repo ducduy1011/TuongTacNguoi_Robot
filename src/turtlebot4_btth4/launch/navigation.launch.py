@@ -20,7 +20,7 @@ from nav2_common.launch import RewrittenYaml
 def validate_map(path):
     map_file = Path(path).expanduser().resolve()
     if not map_file.is_file():
-        raise ValueError(f'Chua co map: {map_file}. Hay mapping va chay save_map.sh truoc.')
+        raise ValueError(f'Chua co map: {map_file}. Hay mapping va luu map bang nav2_map_server/map_saver_cli truoc.')
     data = yaml.safe_load(map_file.read_text())
     if not isinstance(data, dict) or not isinstance(data.get('image'), str):
         raise ValueError('map.yaml phai co truong image hop le.')

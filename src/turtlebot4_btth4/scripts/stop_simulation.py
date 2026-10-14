@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Stop only the selected BTTH04 domain/partition, shutting Nav2 down first."""
 import os
 from pathlib import Path
@@ -42,7 +43,7 @@ def main():
     domain = os.environ.get('ROS_DOMAIN_ID', '')
     partition = os.environ.get('IGN_PARTITION', '')
     if not domain.isdigit() or not partition.startswith('turtlebot4_btth4'):
-        raise SystemExit('Source the BTTH04 env.sh before stopping.')
+        raise SystemExit('Source the workspace install/setup.bash before stopping.')
     rclpy.init()
     node = rclpy.create_node('btth4_shutdown')
     try:

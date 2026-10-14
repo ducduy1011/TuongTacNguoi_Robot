@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """WASD Twist publisher at 10 Hz with a wall-clock keyboard timeout."""
 import select
+import shutil
+import subprocess
 import sys
 import termios
 import time
@@ -8,6 +10,23 @@ import tty
 
 import rclpy
 from geometry_msgs.msg import Twist
+
+
+def set_english_keyboard():
+    if not shutil.which('ibus'):
+        return None
+    try:
+        result = subprocess.run(['ibus', 'engine'], capture_output=True, text=True, timeout=2)
+        previous = result.stdout.strip()
+        if result.returncode == 0 and previous and not previous.startswith('xkb:'):
+            switched = subprocess.run(['ibus', 'engine', 'xkb:us::eng'],
+                                      capture_output=True, timeout=2)
+            if switched.returncode == 0:
+                print('English keyboard enabled; previous input method is restored on exit.')
+                return previous
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    return None
 
 
 def main():
@@ -32,7 +51,9 @@ def main():
     print('W/S: forward/backward; A/D: turn; Space/X: stop; Ctrl+C: exit.')
     print(f'Hold/repeat keys. Publish 10 Hz; stop after {timeout:.1f}s without a key.')
     print(f'Linear speed: {speed:.2f} m/s; angular speed: {turn:.2f} rad/s.')
+    previous_keyboard = None
     try:
+        previous_keyboard = set_english_keyboard()
         tty.setraw(sys.stdin.fileno())
         while rclpy.ok():
             poll_time = max(0.0, min(0.03, next_publish - time.monotonic()))
@@ -62,6 +83,12 @@ def main():
                 pub.publish(Twist())
                 time.sleep(0.03)
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+        if previous_keyboard:
+            try:
+                subprocess.run(['ibus', 'engine', previous_keyboard],
+                               capture_output=True, timeout=2)
+            except (OSError, subprocess.TimeoutExpired):
+                pass
         print()
         node.destroy_node()
         if rclpy.ok():
