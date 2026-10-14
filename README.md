@@ -2,11 +2,31 @@
 
 Ubuntu 22.04, ROS 2 Humble Desktop, Gazebo Fortress, TurtleBot 4 **Standard** và world `maze` chính thức. Launch chỉ chấp nhận `model:=standard`. Robot có shell, tháp cảm biến, RPLIDAR và OAK-D-Pro.
 
-Workspace đã được làm sạch để bạn tự thực hiện lượt quay mới. Thư mục `maps/` chưa có bản đồ. Sau khi khảo sát, bạn phải lưu và upload `map.yaml` + `map.pgm`; không có kết quả navigation được điền sẵn.
+Repository đã chứa source, launch, configuration và bản đồ được lưu từ lượt SLAM với TurtleBot 4 Standard. Sau khi cài và build, có thể load bản đồ này để chạy localization/Nav2; chỉ cần mapping lại nếu muốn tạo bản đồ mới.
+
+## Cấu trúc
+
+```text
+src/turtlebot4_btth4/
+├── package.xml, CMakeLists.txt
+├── launch/
+│   ├── simulation.launch.py   # Gazebo và TurtleBot 4 Standard
+│   ├── mapping.launch.py      # SLAM Toolbox và RViz
+│   └── navigation.launch.py   # Map Server, AMCL, RViz và Nav2
+├── config/                    # SLAM, DDS và hai cấu hình RViz
+├── scripts/                   # WASD và chờ localization trước khi mở Nav2
+└── maps/
+    ├── map.yaml
+    └── map.pgm
+```
+
+Các script ở thư mục gốc cài dependency, chuẩn bị runtime, thiết lập môi trường, điều khiển WASD, lưu map và dừng phiên chạy. Thư mục `runtime/` chứa mã cần cho các script này.
+
+Bản đồ đi kèm có kích thước **402 × 401 ô**, độ phân giải **0,05 m/ô**, origin **[-8.04, -10, 0]**. YAML dùng đường dẫn tương đối `image: map.pgm`, nên có thể clone sang máy khác. Origin là vị trí góc bản đồ, không phải initial pose của robot.
 
 ## Cài và build
 
-Máy khác cần Ubuntu 22.04, ROS 2 Humble Desktop, ROS apt repository, Internet và phiên desktop có GPU hoạt động.
+Máy khác cần Ubuntu 22.04, ROS 2 Humble Desktop, ROS apt repository, Internet và phiên desktop có GPU hoạt động. Nếu chưa có ROS, cài **ROS 2 Humble Desktop** theo [hướng dẫn Ubuntu chính thức](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html) trước. Với WSL2 cần WSLg và đồ họa OpenGL hoạt động.
 
 ```bash
 git clone --branch assignments_4 --single-branch \
@@ -18,7 +38,7 @@ source /opt/ros/humble/setup.bash
 colcon build --symlink-install --packages-select turtlebot4_btth4
 ```
 
-Trên máy hiện tại đã build xong. Không cần cài/build lại trước mỗi lượt chạy.
+Chỉ cần cài/build ở lần đầu hoặc sau khi sửa source. Mọi Terminal dùng để chạy phải source `env.sh` như hướng dẫn dưới đây.
 
 Phiên bản đã kiểm tra: TurtleBot 4 Simulator 1.0.3, SLAM Toolbox 2.6.10, Nav2 1.1.20, RViz 11.2.29 và Fortress 1.0.3. Cài/build từ thư mục source sạch đã thành công trên máy Ubuntu 22.04 này.
 
@@ -26,7 +46,7 @@ Phiên bản đã kiểm tra: TurtleBot 4 Simulator 1.0.3, SLAM Toolbox 2.6.10, 
 
 Các thư mục `.deps/`, `build/`, `install/`, `log/` được tạo trên máy chạy; không nộp lên GitHub. Giữ `.deps/` để chạy. RViz dùng 20 FPS, chỉ hiện TF cần thiết; bản cấu hình mapping không mở costmap/Nav2.
 
-## Chuẩn bị quay
+## Chuẩn bị chạy
 
 Mở **4 Terminal**. Trong mỗi Terminal mới chạy:
 
@@ -158,6 +178,8 @@ Launch tự đọc map mới trong thư mục source khi build bằng symlink. N
 
 Giữ robot ở dock. Dùng **2D Pose Estimate** trong RViz: click vị trí ban đầu trên map, kéo mũi tên theo yaw đã ghi. Đợi scan khớp với các tường và robot ở đúng khu vực/hướng như Gazebo.
 
+Với bản đồ đi kèm và simulator chạy ở vị trí mặc định, điểm khởi đầu trên map gần **(0, 0), yaw ≈ 0**, hướng +X. Đặt pose khi robot còn ở dock. Nếu đã undock hoặc di chuyển, không dùng lại pose ban đầu này; đặt pose theo vị trí hiện tại hoặc dừng và khởi động lại simulator.
+
 ### Terminal 4 — kiểm tra localization
 
 ```bash
@@ -194,6 +216,8 @@ ros2 lifecycle get /bt_navigator
 
 Các node phải `active`. Kiểm tra dock status; nếu còn docked, rời dock bằng các lệnh undock/backup_only như phần 1. Chờ thành công **trước khi đặt goal**. Không mở teleop.
 
+Thứ tự bắt buộc khi chạy lại từ đầu: **simulator → load map/AMCL → đặt 2D Pose Estimate và kiểm tra scan khớp tường → Nav2 active → undock → Nav2 Goal**. Không undock trước rồi đặt lại pose tại điểm ban đầu trên map.
+
 Dùng **Nav2 Goal** trên RViz, chọn một vùng free đủ rộng và kéo mũi tên theo hướng đích. Thực hiện lần lượt:
 1. G1 ở một nhánh/khu vực trên map.
 2. G2 ở một khu vực khác, có đường đi đã được khảo sát.
@@ -221,16 +245,9 @@ Lệnh yên khi không có sự kiện; vẫn quan sát Gazebo.
 
 Khi quay xong, nhấn dừng quay rồi chạy `bash ~/turtlebot4_btth4_ws/stop_btth4.sh` ở Terminal 4 để dừng phiên.
 
-## Những thứ cần nộp sau lượt chạy mới
+## Cập nhật bản đồ sau khi mapping lại
 
-- Video Standard: mapping, map hoàn chỉnh trên RViz, restart/load map, localization và ít nhất 3 goal ở các khu vực khác nhau, không va chạm/teleop khi goal chạy.
-- Ảnh: robot Standard; mapping; map hoàn chỉnh; localization; các goal đã hoàn tất.
-- GitHub Public nhánh `assignments_4`: source/launch/config/README và **map.yaml + map.pgm mới**.
-- PDF dùng đúng ảnh và số liệu của lượt Standard. Điền tọa độ/độ phân giải/kích thước map thực tế, kết quả goal, link video và GitHub.
-
-Video mới có thể đặt trong thư mục Drive bạn đã tạo. Xóa video minh chứng không dùng nữa ở Drive và bật chia sẻ **Anyone with the link / Viewer**. Hiện máy chỉ có kết nối GitHub; việc dọn video trên Drive do bạn thực hiện.
-
-Đưa map mới lên GitHub bằng:
+`save_map.sh` ghi lại cả hai file trong `src/turtlebot4_btth4/maps/`. Nếu tạo bản đồ mới, cập nhật thông tin map trong README và đưa cả YAML/PGM lên nhánh `assignments_4`:
 
 ```bash
 cd ~/turtlebot4_btth4_ws
@@ -239,7 +256,15 @@ git commit -m "Add map built with TurtleBot 4 Standard"
 git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push origin assignments_4
 ```
 
-Hoặc báo đã lưu map để agent cập nhật. Tải video lên Drive, kiểm tra link khi chưa đăng nhập; chỉ nộp PDF sau khi thay đủ ảnh/kết quả và link.
+`build/`, `install/`, `log/` và `.deps/` được bỏ qua bằng `.gitignore`; máy khác tạo lại chúng bằng các bước cài/build.
+
+## Khi Nav2 không chạy được
+
+- **AMCL báo `Please set the initial pose`, robot/scan chưa hiện:** đặt `2D Pose Estimate`. Nav2 chỉ khởi động sau khi nhận pose và có TF `map → base_link`.
+- **LiDAR lệch tường, vị trí robot nhảy hoặc planner báo không có đường:** kiểm tra localization trước. Nếu đã undock rồi đặt pose của điểm khởi đầu, dừng bằng `stop_btth4.sh`, khởi động lại và làm đúng thứ tự ở Phần 4. Không sửa origin YAML để dịch robot trên map.
+- **Không thấy planner/controller:** kiểm tra không dùng `nav2:=false`; tùy chọn đó chỉ mở localization. Khi khởi động lại AMCL, cần đặt lại pose.
+- **Goal thất bại dù scan khớp map:** chọn goal trong vùng free có đường nối với robot và đủ khoảng hở với tường; tránh vùng unknown và dock. Hủy goal cũ trước khi sửa pose hoặc thử lại. Không dùng WASD khi goal đang chạy.
+- **Phiên cũ còn chạy hoặc Ctrl+C không phản hồi:** chạy `bash ~/turtlebot4_btth4_ws/stop_btth4.sh`, chờ dừng hoàn toàn rồi mở lại. File bản đồ được giữ nguyên.
 
 ## Kết quả kiểm tra và phạm vi
 
