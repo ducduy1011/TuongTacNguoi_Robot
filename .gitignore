@@ -3,6 +3,9 @@
 /log/
 /.work/
 /.deps/
+/.venv-yolo/
+/.models/
+/runs/
 __pycache__/
 *.pyc
 *.bak

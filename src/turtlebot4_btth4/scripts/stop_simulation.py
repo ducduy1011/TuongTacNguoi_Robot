@@ -20,9 +20,14 @@ def processes(domain, partition):
             if f'ROS_DOMAIN_ID={domain}'.encode() not in env or f'IGN_PARTITION={partition}'.encode() not in env:
                 continue
             args = (entry / 'cmdline').read_bytes().decode().split('\0')[:-1]
-            launcher = any(args[i:i+2] == ['launch', 'turtlebot4_btth4'] for i in range(len(args)))
+            launcher = any(args[i:i+2] in (['launch', 'turtlebot4_btth4'],
+                                          ['launch', 'turtlebot4_btth5']) for i in range(len(args)))
             executable = args[0] if args else ''
-            node = executable.startswith('/opt/ros/humble/lib/') or executable.endswith('/teleop_wasd')
+            node = (executable.startswith('/opt/ros/humble/lib/')
+                    or executable.endswith('/teleop_wasd')
+                    or any('/turtlebot4_btth5/' in a and
+                           a.endswith(('/navigate_goals', '/yolo_detector', '/record_pose',
+                                       '/prepare_robot', '/spawn_objects')) for a in args))
             gazebo = executable.startswith('ign gazebo')
             if launcher or node or gazebo:
                 found[int(entry.name)] = launcher
@@ -99,7 +104,7 @@ def main():
     while time.monotonic() < end and processes(domain, partition):
         time.sleep(0.2)
     send(processes(domain, partition), signal.SIGKILL)
-    print(f'BTTH04 domain {domain}: stopped simulator, SLAM, localization, Nav2 and teleop.')
+    print(f'BTTH04/05 domain {domain}: stopped simulator, SLAM, localization, Nav2, teleop and YOLO.')
 
 
 if __name__ == '__main__':

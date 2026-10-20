@@ -1,0 +1,8 @@
+# Three Publish Point positions supplied by the student on 2026-10-21.
+# Frame: map; x/y in metres, yaw in radians. Preserve the selected order.
+# Publish Point has no yaw: face chair_4, person_2, chair respectively on arrival.
+# Nav2 computed all three connecting paths; actual navigation must be recorded again.
+goals:
+  - {name: Goal_1, x: 11.082430839538574, y: -8.204781532287598, yaw: 1.918947437768375}
+  - {name: Goal_2, x: -6.781111240386963, y: 1.1951048374176025, yaw: 1.2347880379381602}
+  - {name: Goal_3, x: -6.455601215362549, y: -8.403457641601562, yaw: 0.6966853365700172}

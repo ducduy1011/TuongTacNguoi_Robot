@@ -62,19 +62,17 @@ def start_navigation(context, exercise, navigation):
         root_key='', convert_types=True,
         param_rewrites={'robot_radius': '0.25', 'inflation_radius': '0.60',
                         'cost_scaling_factor': '3.0'})
-    rviz_config = PythonExpression([
-        "'btth4.rviz' if '", LaunchConfiguration('nav2'),
-        "' == 'true' else 'mapping.rviz'"])
     localization = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(PathJoinSubstitution(
             [navigation, 'launch', 'localization.launch.py'])),
-        launch_arguments={'use_sim_time': 'true', 'map': map_file}.items())
+        launch_arguments={'use_sim_time': 'true', 'map': map_file,
+                          'params': LaunchConfiguration('localization_params')}.items())
     plugin = Path(get_package_prefix('nav2_rviz_plugins')) / 'lib/libnav2_rviz_plugins.so'
     preload = str(plugin)
     if os.environ.get('LD_PRELOAD'):
         preload += ' ' + os.environ['LD_PRELOAD']
     rviz = Node(package='rviz2', executable='rviz2', name='rviz2',
-                arguments=['-d', PathJoinSubstitution([exercise, 'config', rviz_config])],
+                arguments=['-d', LaunchConfiguration('rviz_config')],
                 parameters=[{'use_sim_time': True}],
                 # Keep the plugin resident until ROS callback groups are destroyed.
                 additional_env={'LD_PRELOAD': preload},
@@ -107,6 +105,12 @@ def generate_launch_description():
             Path(__file__).resolve().parents[1] / 'maps' / 'map.yaml')),
         DeclareLaunchArgument('nav2', default_value='true', choices=['true', 'false']),
         DeclareLaunchArgument('rviz', default_value='true', choices=['true', 'false']),
+        DeclareLaunchArgument('localization_params', default_value=PathJoinSubstitution([
+            navigation, 'config', 'localization.yaml'])),
+        DeclareLaunchArgument('rviz_config', default_value=PathJoinSubstitution([
+            exercise, 'config', PythonExpression([
+                "'btth4.rviz' if '", LaunchConfiguration('nav2'),
+                "' == 'true' else 'mapping.rviz'"])])),
         OpaqueFunction(function=start_navigation,
                        kwargs={'exercise': exercise, 'navigation': navigation}),
     ])

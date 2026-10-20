@@ -11,6 +11,7 @@ def generate_launch_description():
     simulator = get_package_share_directory('turtlebot4_ignition_bringup')
     create = get_package_share_directory('irobot_create_ignition_bringup')
     models = str(Path(get_package_share_directory('turtlebot4_description')).parent)
+    exercise = get_package_share_directory('turtlebot4_btth4')
     gpu = []
     if Path('/proc/driver/nvidia/version').exists():
         gpu = [SetEnvironmentVariable('__NV_PRIME_RENDER_OFFLOAD', '1'),
@@ -32,6 +33,7 @@ def generate_launch_description():
                               'model': LaunchConfiguration('model'),
                               'x': LaunchConfiguration('x'),
                               'y': LaunchConfiguration('y'),
+                              'param_file': str(Path(exercise) / 'config/simulation_node.yaml'),
                               'use_sim_time': 'true', 'rviz': 'false',
                               'slam': 'false', 'localization': 'false',
                               'nav2': 'false'}.items()),

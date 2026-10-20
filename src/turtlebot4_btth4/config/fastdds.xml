@@ -13,4 +13,15 @@
       <useBuiltinTransports>false</useBuiltinTransports>
     </rtps>
   </participant>
+  <!-- Humble service replies wait for discovery using this DDS deadline.
+       The 100 ms default can lose robot_description during a cold Gazebo start.
+       ROS still sets each endpoint's requested reliability and history. -->
+  <publisher profile_name="btth4_writer" is_default_profile="true">
+    <qos>
+      <reliability>
+        <kind>RELIABLE</kind>
+        <max_blocking_time><sec>10</sec><nanosec>0</nanosec></max_blocking_time>
+      </reliability>
+    </qos>
+  </publisher>
 </profiles>

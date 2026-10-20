@@ -1,5 +1,7 @@
 set;ROS_DOMAIN_ID;44
-set;ROS_LOCALHOST_ONLY;1
+# Humble otherwise adds an SHM transport even when XML disables built-in transports.
+# The XML interface whitelist itself restricts this workspace to 127.0.0.1.
+set;ROS_LOCALHOST_ONLY;0
 set;RMW_IMPLEMENTATION;rmw_fastrtps_cpp
 set;FASTRTPS_DEFAULT_PROFILES_FILE;@CMAKE_INSTALL_PREFIX@/share/turtlebot4_btth4/config/fastdds.xml
 set;RMW_FASTRTPS_PUBLICATION_MODE;ASYNCHRONOUS

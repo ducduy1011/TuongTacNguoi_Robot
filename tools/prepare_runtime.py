@@ -125,6 +125,31 @@ def prepare_controller():
     index = runtime / 'share/ament_index/resource_index/packages'
     index.mkdir(parents=True, exist_ok=True)
     (index / 'irobot_create_control').touch()
+    # Rendering the Standard robot at cold start can hold a controller service
+    # longer than the spawner's 10 s default. Keep the official spawner/controller;
+    # only give startup RPCs enough time, preventing duplicate configure requests.
+    (index / 'controller_manager').touch()
+    manager_share = runtime / 'share/controller_manager'
+    if not manager_share.exists():
+        manager_share.symlink_to('/opt/ros/humble/share/controller_manager', target_is_directory=True)
+    manager_bin = runtime / 'lib/controller_manager'
+    manager_bin.mkdir(parents=True, exist_ok=True)
+    for item in Path('/opt/ros/humble/lib/controller_manager').iterdir():
+        target = manager_bin / item.name
+        if item.name != 'spawner' and not target.exists():
+            target.symlink_to(item, target_is_directory=item.is_dir())
+    spawner = manager_bin / 'spawner'
+    spawner.write_text('''#!/usr/bin/env python3
+import os
+import sys
+extra = []
+for option, value in [('--service-call-timeout', '60'), ('--controller-manager-timeout', '120')]:
+    if not any(arg.split('=')[0] == option for arg in sys.argv[1:]):
+        extra.extend([option, value])
+original = '/opt/ros/humble/lib/controller_manager/spawner'
+os.execv(original, [original] + extra + sys.argv[1:])
+''')
+    spawner.chmod(0o755)
     print('Local Create 3 controller configuration: 100 Hz.', flush=True)
 
 
