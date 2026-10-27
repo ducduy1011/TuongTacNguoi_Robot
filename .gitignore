@@ -1,12 +1,7 @@
-/build/
-/install/
-/log/
-/.work/
-/.deps/
-/.venv-yolo/
-/.models/
-/runs/
+build/
+install/
+log/
+.venv/
 __pycache__/
 *.pyc
-*.bak
-*~
+*.egg-info/
