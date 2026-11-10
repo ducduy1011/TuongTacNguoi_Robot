@@ -1,0 +1,24 @@
+# Pixel [u, v]: goc tren trai anh; u tang sang phai, v tang xuong duoi.
+# Chi dung voi maps/warehouse.pgm (1006 x 1674 pixel).
+clearance_m: 0.35
+regions:
+  - id: A
+    name: Khu nhận hàng
+    aliases: [khu vực a, khu a, a]
+    polygon: [[0, 0], [1005, 0], [1005, 599], [0, 599]]
+  - id: B
+    name: Hành lang
+    aliases: [khu vực b, khu b, b, khu vực bê, khu bê, bê]
+    polygon: [[0, 600], [1005, 600], [1005, 999], [0, 999]]
+  - id: C
+    name: Khu lưu trữ
+    aliases: [khu vực c, khu c, c, khu vực xê, khu xê, xê]
+    polygon: [[0, 1000], [1005, 1000], [1005, 1673], [0, 1673]]
+
+# Diem den bo sung gan ban table0, khong thay doi ba vung A/B/C.
+waypoints:
+  - id: BAN
+    name: Gần bàn
+    aliases: [bàn, cái bàn, khu bàn]
+    pixel: [80, 583]
+    yaw: -1.5707963267948966

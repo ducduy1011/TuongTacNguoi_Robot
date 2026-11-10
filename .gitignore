@@ -1,0 +1,10 @@
+build/
+install/
+log/
+models/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Bao cao nop rieng, khong dua len GitHub
+report/

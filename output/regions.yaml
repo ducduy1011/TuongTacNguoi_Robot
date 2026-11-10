@@ -1,0 +1,65 @@
+map: /home/duy/bai7/maps/warehouse.yaml
+frame_id: map
+regions:
+- id: A
+  name: Khu nhận hàng
+  aliases:
+  - khu vực a
+  - khu a
+  - a
+  pixel:
+  - 872
+  - 131
+  clearance_m: 3.87
+  goal:
+    x: 11.075000000000001
+    y: 21.275
+    yaw: 0.0
+- id: B
+  name: Hành lang
+  aliases:
+  - khu vực b
+  - khu b
+  - b
+  - khu vực bê
+  - khu bê
+  - bê
+  pixel:
+  - 398
+  - 737
+  clearance_m: 4.934
+  goal:
+    x: -3.1449999999999996
+    y: 3.094999999999999
+    yaw: 0.0
+- id: C
+  name: Khu lưu trữ
+  aliases:
+  - khu vực c
+  - khu c
+  - c
+  - khu vực xê
+  - khu xê
+  - xê
+  pixel:
+  - 857
+  - 1012
+  clearance_m: 3.529
+  goal:
+    x: 10.624999999999998
+    y: -5.155000000000001
+    yaw: 0.0
+- id: BAN
+  name: Gần bàn
+  aliases:
+  - bàn
+  - cái bàn
+  - khu bàn
+  pixel:
+  - 80
+  - 583
+  clearance_m: 0.806
+  goal:
+    x: -12.684999999999999
+    y: 7.714999999999996
+    yaw: -1.5707963267948966
